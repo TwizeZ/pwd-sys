@@ -7,7 +7,7 @@
 def options():
     print("[1] Create new entry.")
     print("[2] Edit entry.")
-    print("[3] Search and manage entries.")
+    print("[3] Search entries.")
     print("[0] Exit application.")
 
 def option_1():

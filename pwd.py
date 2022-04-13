@@ -3,8 +3,7 @@
 #Password System
 #11-05-2022
 
-import random
-# from time import sleep
+from time import sleep
    
 
 class Passwords:
@@ -17,29 +16,77 @@ class Passwords:
         self.notes = notes
         # self.created = created
 
+    def pwd_info(self):
+        print(f"Name:       {self.name}")
+        print("---")
+        print(f"Username:   {self.username}")
+        print(f"E-mail:     {self.email}")
+        print(f"Password:   {self.password}")
+        print("---")
+        print("Additional notes:")
+        print(self.notes)
+
+class Begin:
+    def start_sys(self):        
+        print("Initiating password system...")
+        sleep(2)
+        print("Database online.")
+        
+    
+        search = input("Input name of password: ")
+        
+        file = open('passwords.txt', 'r', encoding='utf8')
+        
+        flag = 0
+        index = 0
+
+        for line in file:
+            index += 1
+
+            if search in line:
+                flag = 1
+                break
+        
+        if flag == 0:
+            print(f"{search} was not found.")
+        else:
+            print(f"{search} was found in line {index}")
+            self.name = load_pwd()
+            
+            for info in range(index):
+                self.name[info].pwd_info()
 
 
-def load_question():
-    questions = []
+            # if search in passwords:
+            #     Passwords().pwd_info()
+            # else:
+            #     print("No such password was found.")
+            #     continue
+        
+
+def load_pwd():
+    passwords = []
     with open("passwords.txt", "r", encoding="utf8") as f:
         for line in f.readlines():
-            selection = line.split("/")
-            pwd = Passwords(selection[0],
-                            selection[1],
-                            selection[2].split(","))
+            section = line.split("/")
+            pwd = Passwords(section[0],
+                            section[1],
+                            section[2],
+                            section[3],
+                            section[4])
             
-            questions.append(pwd)
-    return questions
+            passwords.append(pwd)
+    return passwords
 
-def question_quantity():
-    with open("passwords.txt", "r", encoding="utf8") as fp:
-        qtot = len(fp.readlines())
-    return qtot    
+def pwd_quantity():
+    with open("passwords.txt", "r", encoding="utf8") as f:
+        ptot = len(f.readlines())
+    return ptot    
 
 
 
 def main():
-    pass
+    Begin().start_sys()
 
 if __name__ == "__main__":
     main()
