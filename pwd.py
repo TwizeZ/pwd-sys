@@ -4,12 +4,12 @@
 #11-05-2022
 
 from time import sleep
-   
+from getpwd import getpwd
 
 class Passwords:
-    def __init__(self, name : str, username : str, email : str, password : str, notes : str):
-        # def for format in passwords.txt
-        self.name = name
+    def __init__(self, entry : str, username : str, email : str, password : str, notes : str):
+        # function for format in passwords.txt
+        self.entry = entry
         self.username = username
         self.email = email
         self.password = password
@@ -17,7 +17,7 @@ class Passwords:
         # self.created = created
 
     def pwd_info(self):
-        print(f"Name:       {self.name}")
+        print(f"Entry Name: {self.entry}")
         print("---")
         print(f"Username:   {self.username}")
         print(f"E-mail:     {self.email}")
@@ -26,35 +26,41 @@ class Passwords:
         print("Additional notes:")
         print(self.notes)
 
-class Begin:
-    def start_sys(self):        
-        print("Initiating password system...")
-        sleep(2)
-        print("Database online.")
-        
+def start_sys():
+    # Denna funktion borde läsa in alla lösenord i "databasen" och lagra i programmet - bör byta om funktionen då den inte gör detta
+    print("Initiating password system...")
+    sleep(1)
+    print("Database online.")
+    find_pwd()
     
-        search = input("Input name of password: ")
-        
-        file = open('passwords.txt', 'r', encoding='utf8')
-        
-        flag = 0
-        index = 0
+def find_pwd():
+    passwords = load_pwd()
 
-        for line in file:
-            index += 1
+    search_name = input("Input your username: ")
+    search_pwd = getpwd("Input your password: ")
+    current_user = ""
+    for pwd in passwords:
+        if search_pwd == pwd.password and search_name == pwd.username:
+            print("Found entry!")
+            current_user = pwd
+            break
+    else:
+        print("Not found in database. The username or password is incorrect.")
+    
+    if current_user != "":
+        # då har vi kommit åt rätt inloggning
+        Passwords.pwd_info(pwd)
 
-            if search in line:
-                flag = 1
-                break
-        
-        if flag == 0:
-            print(f"{search} was not found.")
+        # edit entry information - will be moved to new function
+        edit_entry = input("Would you like to edit any information found in this entry? [yes, no]: ")
+
+        if "yes" in edit_entry:
+            pass
         else:
-            print(f"{search} was found in line {index}")
-            self.name = load_pwd()
-            
-            for info in range(index):
-                self.name[info].pwd_info()
+            pass        
+        
+            # for info in range(index):
+                # self.name[info].pwd_info()
 
 
             # if search in passwords:
@@ -86,7 +92,7 @@ def pwd_quantity():
 
 
 def main():
-    Begin().start_sys()
+    start_sys()
 
 if __name__ == "__main__":
     main()
