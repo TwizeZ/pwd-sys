@@ -5,6 +5,7 @@
 
 from time import sleep
 from getpwd import getpwd
+import os
 
 class Menu:
     def options():
@@ -45,6 +46,7 @@ class Menu:
             choice = input(">> ")
 
         else:
+            clearConsole()
             print ("You chose to end the program. See you next time.")
 
 class Passwords:
@@ -72,11 +74,11 @@ class Managing:
         passwords = load_pwd()
         current_user = ""
         
-        eentry = input("Input the entry name: ")
-        eusername = input("Input the username of your entry: ")
-        eemail = input("Input the E-mail of your entry: ")
-        epassword = input("Input the password of your entry: ")
-        enotes = input("Would you like to add any notes to your entry? [yes, no]:")
+        eentry = input("1. Input the entry name: ")
+        eusername = input("2. Input the username of your entry (not your E-mail): ")
+        eemail = input("3. Input the E-mail of your entry: ")
+        epassword = input("4. Input the password of your entry: ")
+        enotes = input("5. Would you like to add any notes to your entry? [yes, no]:")
 
         if "yes".casefold() in enotes.casefold():
             enotes = ""
@@ -120,7 +122,8 @@ def find_pwd():
     
     for pwd in passwords:
         if search_entry.casefold() == pwd.entry:
-            print("Found entry!")
+            print("\nFound entry! Loading...\n")
+            sleep(1.5)
             current_user = pwd
             break
     else:
@@ -141,8 +144,15 @@ def find_pwd():
             #     print("No such password was found.")
             #     continue
     
-    #NOTE: PRESS ENTER TO CONTINUE här + clear colsole + return to menu
-        
+    
+    
+    #Separationsfunktion för att rensa hela terminalen. NOTE: Bör kanske sättas i egen funnktion
+    print("\nPress Enter to go back to the main menu")
+    i = input(">> ")
+    if "" in i:
+        clearConsole()
+        pass
+
 
 def load_pwd():
     passwords = []
@@ -162,6 +172,12 @@ def pwd_quantity():
     with open("passwords.txt", "r", encoding="utf8") as f:
         ptot = len(f.readlines())
     return ptot    
+
+def clearConsole():
+    command = "clear"
+    if os.name in ("nt", "dos"):
+        command = "cls"
+    os.system(command)
 
 
 
