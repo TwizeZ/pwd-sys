@@ -9,21 +9,26 @@ import os
 
 class Menu:
     def options():
+        print()
         print("[1] Create new entry.")
         print("[2] List of all entries.")
         print("[3] Search entries.")
         print("[0] Exit application.")
 
     def option_1():
-        print ("Please fill in all following inputs. If information about the entry is missing, fill the gap with '-'.")
+        print()
+        print ("Please fill in all following inputs.\n")
         Managing.create_entry()
 
     def option_2():
         # print ("Input the name of the current account. If you would like to see a list of all entries, please input [X].")
-        print ("Here is a list of all your entries stored in your local database.")
+        print()
+        print ("Here is a list of all your entries stored in your local database.\n")
+        Passwords.pwd_list()
     
     def option_3():
-        print ("Input the name of the account. Input [X] to view, or [Y] to edit entry. You can delete the account by selecting [Z].")
+        print()
+        print("Input the name of the account. Input [X] to view, or [Y] to edit entry. You can delete the account by selecting [Z].\n")
         find_pwd()
 
     def menu():
@@ -59,7 +64,8 @@ class Passwords:
         self.notes = notes
         # self.created = created
 
-    def pwd_info(self):
+    def pwd_format(self):
+        print("-------------------------------")
         print(f"Entry Name: {self.entry}")
         print("---")
         print(f"Username:   {self.username}")
@@ -68,10 +74,19 @@ class Passwords:
         print("---")
         print("Additional notes:")
         print(self.notes)
+        print("-------------------------------")
+
+    def pwd_list():
+        count = 0
+        with open("passwords.txt", "r", encoding="utf8") as f:
+            lines = f.readlines()
+            for line in lines:
+                count += 1
+                print("Entry {}: {}".format(count, line.strip()))
+        pressEnter()
 
 class Managing:
-    def create_entry(): # används ej någonstans för närvarande
-        passwords = load_pwd()
+    def create_entry():
         current_user = ""
         
         eentry = input("1. Input the entry name: ")
@@ -84,11 +99,31 @@ class Managing:
             enotes = ""
             enotes = input("Input your notes: ")
         else:
-            enotes = "[Empty]"
+            enotes = ""
+            enotes = "-"
         
         with open("passwords.txt", "a", encoding="utf8") as x:
             x.write("\n"+eentry+"/"+eusername+"/"+eemail+"/"+epassword+"/"+enotes+"/") #f"{name}\n"
-        
+
+        passwords = load_pwd()
+        viewNow = input(f"'{eentry}' entry successfully created. Would you like to view the entry now? [yes, no]:")
+        print()
+        if "yes" in viewNow:
+            current_user = ""
+            for pwd in passwords:
+                if eentry.casefold() == pwd.entry:
+                    current_user = pwd
+                    break
+            else:
+                print("Error: Could not load entry.")
+
+            if current_user != "":
+                # då har vi kommit åt rätt inloggning
+                Passwords.pwd_format(pwd)
+                pressEnter()
+        else:
+            pressEnter()
+
     def delete_entry():
         pass
 
@@ -98,7 +133,7 @@ class Managing:
 
 
 def start_sys():
-    # Denna funktion borde läsa in alla lösenord i "databasen" och lagra i programmet - bör byta om funktionen då den inte gör detta
+    # NOTE Denna funktion borde läsa in alla lösenord i "databasen" och lagra i programmet - bör byta om funktionen då den inte gör detta
     # Merge with load_pwd() function?
     print("Initiating password system...")
     sleep(1.5)
@@ -107,8 +142,8 @@ def start_sys():
 def find_pwd():
     passwords = load_pwd()
 
-    search_name = input("Input your username: ")
-    search_pwd = getpwd("Input your password: ")
+    # search_name = input("Input your username: ")
+    # search_pwd = getpwd("Input your password: ")
     search_entry = input("Input your entry name: ")
     
     current_user = ""
@@ -131,28 +166,23 @@ def find_pwd():
 
     if current_user != "":
         # då har vi kommit åt rätt inloggning
-        Passwords.pwd_info(pwd)
+        Passwords.pwd_format(pwd)
 
         
             # for info in range(index):
-                # self.name[info].pwd_info()
+                # self.name[info].pwd_format()
 
 
             # if search in passwords:
-            #     Passwords().pwd_info()
+            #     Passwords().pwd_format()
             # else:
             #     print("No such password was found.")
             #     continue
     
     
-    
-    #Separationsfunktion för att rensa hela terminalen. NOTE: Bör kanske sättas i egen funnktion
-    print("\nPress Enter to go back to the main menu")
-    i = input(">> ")
-    if "" in i:
-        clearConsole()
-        pass
-
+    # NOTE Sätt in "What would you like to do?" meny, med alternativ så som edit, delete och back to main menu
+    # Separationsfunktion för att rensa hela terminalen
+    pressEnter()
 
 def load_pwd():
     passwords = []
@@ -168,6 +198,7 @@ def load_pwd():
             passwords.append(pwd)
     return passwords
 
+# pwd_quantity not currently utilized
 def pwd_quantity():
     with open("passwords.txt", "r", encoding="utf8") as f:
         ptot = len(f.readlines())
@@ -179,7 +210,12 @@ def clearConsole():
         command = "cls"
     os.system(command)
 
-
+def pressEnter():
+    print()
+    print("\nPress Enter to go back to the main menu")
+    i = input(">> ")
+    if "" in i:
+        clearConsole()
 
 def main():
     start_sys()
