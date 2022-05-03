@@ -52,35 +52,33 @@ class Menu:
                 break
             # BUG Does not exit application, only logs you out
             else:
+                clearConsole()
                 print("Invalid option. Please choose between the options listed.")
-                continue
-            
+
             Menu.options()
-            choice = input(">> ")
+            choice == input(">> ")
+            # BUG Saves choice from first input, and just repeats it every time you press enter. If you press another input, it does not update it.
 
         else:
             clearConsole()
             print ("You chose to end the program. See you next time.")
 
 class Passwords:
-    def __init__(self, entry : str, username : str, email : str, password : str, notes : str):
+    def __init__(self, username : str, email : str, password : str, notes : str):
         # function for format in passwords.txt
-        self.entry = entry.casefold()
         self.username = username
         self.email = email
         self.password = password
         self.notes = notes
-        # self.created = created
 
     def pwd_format(self):
         print("-------------------------------")
-        print(f"Entry Name: {self.entry}")
+        print(f"Username: {self.username}")
         print("---")
-        print(f"Username:   {self.username}")
         print(f"E-mail:     {self.email}")
         print(f"Password:   {self.password}")
         print("---")
-        print("Additional notes:")
+        print("Security note:")
         print(self.notes)
         print("-------------------------------")
 
@@ -90,10 +88,10 @@ def pwdList():
         lines = f.readlines()
         for line in lines:
             count += 1
-            print(f"Entry {count}: {line.split('/')[0]}")
+            print(f"User {count}: {line.split('/')[0]}")
         tot = totPwd()
         print()
-        print(f"The total number of passwords currently stored is {tot}.")
+        print(f"The total number of users currently stored is {tot}.")
     pressEnter()
 
 def login():
@@ -108,27 +106,26 @@ def login():
     print("Proceed by logging in to your account.")
 
     while True:
-        uName = input("\nInput your username: ")
-        uPass = getpwd("Input your password: ")
+        uUsername = input("\nInput your username: ")
+        uPassword = getpwd("Input your password: ")
 
         current_user = ""
         for pwd in passwords:
-            if uPass == pwd.password and uName == pwd.username:
+            if uPassword == pwd.password and uUsername == pwd.username:
                 print("\nLogging in...")
                 sleep(1.5)
                 current_user = pwd
                 break
         else:
-            print("\nNot found in database. The username or password is incorrect.")
+            print("\nThe user was not found in database. The username or password is incorrect.")
             continue
 
         if current_user != "":
             # då har vi kommit åt rätt inloggning
             # Passwords.pwd_format(pwd)
             clearConsole()
-            print(f"\nWelcome back, {uName}.")
+            print(f"\nWelcome back, {uUsername}.")
             Menu.menu()
-
 
 def logout():
     print("\nLogging you out...")
@@ -144,16 +141,15 @@ def createEntry():
     passwords = loadPwd()
     
     while True:
-        eentry = input("1. Input the entry name: ")  
+        eusername = input("1. Input your username: ")  
         for pwd in passwords:
-            # eentry = input("1. Input the entry name: ")
-            if eentry.casefold() == pwd.entry:
-                print("\nEntry with the same name already exists. Please name your entry something else.\n")
+            if eusername == pwd.username:
+                print("\nA user with the same name already exists. Please pick another username.\n")
                 break
         else:
             break
     
-    eusername = input("2. Input the username of your entry (not your E-mail): ")
+    # eusername = input("2. Input the username of your entry (not your E-mail): ")
     eemail = input("3. Input the E-mail of your entry: ")
     epassword = input("4. Input the password of your entry: ")
     
@@ -177,19 +173,20 @@ def createEntry():
         enotes = "-"
     
     with open("passwords.txt", "a", encoding="utf8") as x:
-        x.write("\n"+eentry+"/"+eusername+"/"+eemail+"/"+epassword+"/"+enotes+"/")
-
-    passwords = loadPwd()
-    viewNow = input(f"'{eentry}' entry successfully created. Would you like to view the entry now? [yes, no]:")
+        x.write("\n"+eusername+"/"+eemail+"/"+epassword+"/"+enotes+"/")
+    
+    print(f"A user by the name of '{eusername}' was successfully created.")
+    viewNow = input("Would you like to view the entry now? [yes, no]:")
+    
     print()
     if "yes".casefold() in viewNow.casefold():
         current_user = ""
         for pwd in passwords:
-            if eentry.casefold() == pwd.entry:
+            if eusername == pwd.username:
                 current_user = pwd
                 break
         else:
-            print("Error: Could not load entry.")
+            print("Error: Could not load entry. Please report this issue to the developer.")
 
         if current_user != "":
             # då har vi kommit åt rätt inloggning
@@ -212,75 +209,50 @@ def deleteEntry():
 def editEntry():
     choice = input("What you you like to edit in your entry?\n>> ")
     
-    print("[1] Entry name.")
-    print("[2] Username.")
-    print("[3] E-mail.")
-    print("[4] Password.")
-    print("[5] Notes.")
+    print("[1] Username.")
+    print("[2] E-mail.")
+    print("[3] Password.")
+    print("[4] Notes.")
     print()
     print("[0] Back to main menu.")
     
     if choice == "1":
-        changeName = input("What would you like to change the entry name to?: ")
-    elif choice == "2":
         changeUsername = input("What would you like to change the username to?: ")
-    elif choice == "3":
+    elif choice == "2":
         changeEmail = input("What would you like to change the E-mail to?: ")
-    elif choice == "4":
+    elif choice == "3":
         changePassword = input("What would you like to change the password to?: ")
-    elif choice == "5":
+    elif choice == "4":
         changeNotes = input("What notes would you like to add?: ")
     else:
+        clearConsole()
         Menu.menu()
 
 def settings():
     print("This is the settings page. Please input one of the following commands to edit certain settings.")
     print("Change password - 'passwd'")
-    print("Change username - usern")
+    print("Change username - 'usern'")
     
 def findPwd():
     passwords = loadPwd()
 
-    # search_name = input("Input your username: ")
-    # search_pwd = getpwd("Input your password: ")
-    search_entry = input("Input your entry name: ")
-    
-    current_user = ""
-    # for pwd in passwords:
-    #     if search_pwd == pwd.password and search_name == pwd.username:
-    #         print("Found entry!")
-    #         current_user = pwd
-    #         break
-    # else:
-    #     print("Not found in database. The username or password is incorrect.")
-    
+    searchUsers = input("Input the username you want to search for: ")
+    # TODO Press [X] to go back to the main menu
+
+    current_user = ""    
     for pwd in passwords:
-        if search_entry.casefold() == pwd.entry:
+        if searchUsers == pwd.entry:
             print("\nFound entry! Loading...\n")
             sleep(1.5)
             current_user = pwd
             break
     else:
-        print("Not found in database. The entry does not exist.")
+        print("Not found in database. The entry does not exist. Make sure you use CAPS properly.")
 
     if current_user != "":
         # då har vi kommit åt rätt inloggning
-        Passwords.pwd_format(pwd)
-
-        
-            # for info in range(index):
-                # self.name[info].pwd_format()
-
-
-            # if search in passwords:
-            #     Passwords().pwd_format()
-            # else:
-            #     print("No such password was found.")
-            #     continue
+        Passwords.pwd_format(pwd)    
     
-    
-    # NOTE Sätt in "What would you like to do?" meny, med alternativ så som edit, delete och back to main menu
-    # Separationsfunktion för att rensa hela terminalen
     pressEnter()
 
 def loadPwd():
@@ -291,8 +263,7 @@ def loadPwd():
             pwd = Passwords(section[0],
                             section[1],
                             section[2],
-                            section[3],
-                            section[4])
+                            section[3])
             
             passwords.append(pwd)
     return passwords
