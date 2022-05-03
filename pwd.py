@@ -107,8 +107,18 @@ def logout():
 
 def createEntry():
     current_user = ""
+    passwords = loadPwd()
     
-    eentry = input("1. Input the entry name: ")
+    while True:
+        eentry = input("1. Input the entry name: ")  
+        for pwd in passwords:
+            # eentry = input("1. Input the entry name: ")
+            if eentry.casefold() == pwd.entry:
+                print("\nEntry with the same name already exists. Please name your entry something else.\n")
+                break
+        else:
+            break
+    
     eusername = input("2. Input the username of your entry (not your E-mail): ")
     eemail = input("3. Input the E-mail of your entry: ")
     epassword = input("4. Input the password of your entry: ") #NOTE Ask to input password a second time to be sure it is spelled correctly
@@ -174,15 +184,15 @@ def editEntry():
     print()
     print("[0] Back to main menu.")
     
-    if choice == 1:
+    if choice == "1":
         changeName = input("What would you like to change the entry name to?: ")
-    elif choice == 2:
+    elif choice == "2":
         changeUsername = input("What would you like to change the username to?: ")
-    elif choice == 3:
+    elif choice == "3":
         changeEmail = input("What would you like to change the E-mail to?: ")
-    elif choice == 4:
+    elif choice == "4":
         changePassword = input("What would you like to change the password to?: ")
-    elif choice == 5:
+    elif choice == "5":
         changeNotes = input("What notes would you like to add?: ")
     else:
         Menu.menu()
