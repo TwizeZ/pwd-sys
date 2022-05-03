@@ -10,12 +10,11 @@ import os
 class Menu:
     def options():
         print()
-        print("Currently logged in as [USERNAME]") # TODO
-        print()
         print("[1] Create new entry.")
         print("[2] List of all entries.")
         print("[3] Search entries.")
         print("[4] Settings.")
+        print("[5] Log out.")
         print("[0] Exit application.")
 
     def option_1():
@@ -46,9 +45,12 @@ class Menu:
             elif choice == "3":
                 Menu.option_3()
             elif choice == "4":
-                pass
+                settings()
+            elif choice == "5":
+                logout()
             elif choice == "0":
                 break
+            # BUG Does not exit application, only logs you out
             else:
                 print("Invalid option. Please choose between the options listed.")
                 continue
@@ -98,12 +100,44 @@ def login():
     # NOTE Denna funktion borde läsa in alla lösenord i "databasen" och lagra i programmet - bör byta om funktionen då den inte gör detta
     # TODO Merge with loadPwd() function? 
     print("Initiating password system...")
-    sleep(1.5)
+
+    passwords = loadPwd()
+    
     print("Database online.")
+    print("All systems online.")
     print("Proceed by logging in to your account.")
 
+    while True:
+        uName = input("\nInput your username: ")
+        uPass = getpwd("Input your password: ")
+
+        current_user = ""
+        for pwd in passwords:
+            if uPass == pwd.password and uName == pwd.username:
+                print("\nLogging in...")
+                sleep(1.5)
+                current_user = pwd
+                break
+        else:
+            print("\nNot found in database. The username or password is incorrect.")
+            continue
+
+        if current_user != "":
+            # då har vi kommit åt rätt inloggning
+            # Passwords.pwd_format(pwd)
+            clearConsole()
+            print(f"\nWelcome back, {uName}.")
+            Menu.menu()
+
+
 def logout():
-    pass
+    print("\nLogging you out...")
+    sleep(1.5)
+    clearConsole()
+    print("You have been logged out. Have a wonderful day!")
+    sleep(3)
+    clearConsole()
+    login()
 
 def createEntry():
     current_user = ""
@@ -121,7 +155,9 @@ def createEntry():
     
     eusername = input("2. Input the username of your entry (not your E-mail): ")
     eemail = input("3. Input the E-mail of your entry: ")
-    epassword = input("4. Input the password of your entry: ") #NOTE Ask to input password a second time to be sure it is spelled correctly
+    epassword = input("4. Input the password of your entry: ")
+    
+    #NOTE Ask to input password a second time to be sure it is spelled correctly
     
     # while True:
     #     epassword2 =input("   Please input the same password again: ")
@@ -197,13 +233,10 @@ def editEntry():
     else:
         Menu.menu()
 
-
 def settings():
     print("This is the settings page. Please input one of the following commands to edit certain settings.")
     print("Change password - 'passwd'")
     print("Change username - usern")
-
-
     
 def findPwd():
     passwords = loadPwd()
@@ -283,7 +316,7 @@ def pressEnter():
         clearConsole()
 
 def main():
-    Menu.menu()
+    login()
 
 if __name__ == "__main__":
     main()
