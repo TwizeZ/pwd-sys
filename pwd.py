@@ -13,25 +13,12 @@ class Menu:
         print("[1] Create new entry.")
         print("[2] List of all entries.")
         print("[3] Search entries.")
-        print("[4] Settings.")
         print("[5] Log out.")
         print("[0] Exit application.")
-
-    def option_1():
         print()
-        print ("Please fill in all following inputs.\n")
-        createEntry()
-
-    def option_2():
-        # print ("Input the name of the current account. If you would like to see a list of all entries, please input [X].")
-        print()
-        print ("Here is a list of all your entries stored in your local database.\n")
-        pwdList()
-    
-    def option_3():
-        print()
-        print("Input the name of the account. Input [X] to view, or [Y] to edit entry. You can delete the account by selecting [Z].\n")
-        findPwd()
+        print("You can also use the following inputs to change your user settings:")
+        print("Change username - 'usernm'")
+        print("Change password - 'passwd'")
 
     def menu():
         Menu.options()
@@ -39,15 +26,17 @@ class Menu:
 
         while choice != "0":
             if choice == "1":
-                Menu.option_1()
+                createEntry()
             elif choice == "2":
-                Menu.option_2()
+                pwdList()
             elif choice == "3":
-                Menu.option_3()
+                findPwd()
             elif choice == "4":
-                settings()
-            elif choice == "5":
                 logout()
+            elif choice == "usernm":
+                pass
+            elif choice == "passwd":
+                pass
             elif choice == "0":
                 break
             # BUG Does not exit application, only logs you out
@@ -84,6 +73,7 @@ class Passwords:
 
 def pwdList():
     count = 0
+    print("\nFull list of all users in the database:\n")
     with open("passwords.txt", "r", encoding="utf8") as f:
         lines = f.readlines()
         for line in lines:
@@ -136,12 +126,18 @@ def logout():
     clearConsole()
     login()
 
+def confirmPass():
+    pass
+# NOTE is this even necessary?
+
 def createEntry():
     current_user = ""
     passwords = loadPwd()
+
+    print("\nFill in the form. Note that entering an E-mail is optional.\n")
     
     while True:
-        eusername = input("1. Input your username: ")  
+        eusername = input("1. Input a username: ")  
         for pwd in passwords:
             if eusername == pwd.username:
                 print("\nA user with the same name already exists. Please pick another username.\n")
@@ -206,6 +202,7 @@ def deleteEntry():
             if line.strip("\n") != deleteEntry:
                 f.write(line)
 
+# TODO Convert entire function to simple commands accessible from main menu. Remove ability to modify certain properties if necessary.
 def editEntry():
     choice = input("What you you like to edit in your entry?\n>> ")
     
@@ -221,22 +218,19 @@ def editEntry():
     elif choice == "2":
         changeEmail = input("What would you like to change the E-mail to?: ")
     elif choice == "3":
+        # TODO Please input your current password
         changePassword = input("What would you like to change the password to?: ")
     elif choice == "4":
         changeNotes = input("What notes would you like to add?: ")
     else:
         clearConsole()
         Menu.menu()
-
-def settings():
-    print("This is the settings page. Please input one of the following commands to edit certain settings.")
-    print("Change password - 'passwd'")
-    print("Change username - 'usern'")
     
 def findPwd():
     passwords = loadPwd()
 
-    searchUsers = input("Input the username you want to search for: ")
+    searchUsers = input("\nInput the username you want to search for: ")
+    print()
     # TODO Press [X] to go back to the main menu
 
     current_user = ""    
