@@ -7,51 +7,52 @@ from time import sleep
 from getpwd import getpwd
 import os
 
-class Menu:
-    def options():
-        print()
-        print("[1] Create new entry.")
-        print("[2] List of all entries.")
-        print("[3] Search entries.")
-        print("[5] Log out.")
-        print("[0] Exit application.")
-        print()
-        print("You can also use the following inputs to change your user settings:")
-        print("Change username - 'usernm'")
-        print("Change password - 'passwd'")
+def options():
+    print()
+    print("[1] Create new entry.")
+    print("[2] List of all entries.")
+    print("[3] Search entries.")
+    print("[4] Log out.")
+    print("[0] Exit application.")
+    print()
+    print("You can also use the following inputs to change your user settings:")
+    print("Change username - 'usernm'")
+    print("Change password - 'passwd'")
 
-    def menu():
-        Menu.options()
-        choice = input(">> ")
+def menu():
+    options()
+    choice = input(">> ")
 
-        while choice != "0":
-            if choice == "1":
-                createEntry()
-            elif choice == "2":
-                pwdList()
-            elif choice == "3":
-                findPwd()
-            elif choice == "4":
-                logout()
-            elif choice == "usernm":
-                pass
-            elif choice == "passwd":
-                pass
-            elif choice == "0":
-                break
-            # BUG Does not exit application, only logs you out
-            else:
-                clearConsole()
-                print("Invalid option. Please choose between the options listed.")
+    # BUG Does not close application when entering 0, just logs you out.
 
-            Menu.options()
-            choice == input(">> ")
-            # BUG Saves choice from first input, and just repeats it every time you press enter. If you press another input, it does not update it.
-
+    while choice != "0":
+        if choice == "1":
+            createEntry()
+        elif choice == "2":
+            pwdList()
+        elif choice == "3":
+            findPwd()
+        elif choice == "4":
+            break
+        elif choice == "usernm":
+            pass
+        elif choice == "passwd":
+            pass
         else:
             clearConsole()
-            print ("You chose to end the program. See you next time.")
+            print("Invalid option. Please choose between the options listed.")
 
+        options()
+        choice = input(">> ")
+        # BUG Saves choice from first input, and just repeats it every time you press enter. If you press another input, it does not update it.
+
+    else:
+        clearConsole()
+        print ("You chose to end the program. See you next time.")
+        sleep(2)
+        quit()
+
+    logout()
 class Passwords:
     def __init__(self, username : str, email : str, password : str, notes : str):
         # function for format in passwords.txt
@@ -85,12 +86,10 @@ def pwdList():
     pressEnter()
 
 def login():
-    # NOTE Denna funktion borde läsa in alla lösenord i "databasen" och lagra i programmet - bör byta om funktionen då den inte gör detta
-    # TODO Merge with loadPwd() function? 
     print("Initiating password system...")
 
     passwords = loadPwd()
-    
+
     print("Database online.")
     print("All systems online.")
     print("Proceed by logging in to your account.")
@@ -103,11 +102,11 @@ def login():
         for pwd in passwords:
             if uPassword == pwd.password and uUsername == pwd.username:
                 print("\nLogging in...")
-                sleep(1.5)
+                sleep(1)
                 current_user = pwd
                 break
         else:
-            print("\nThe user was not found in database. The username or password is incorrect.")
+            print("\nThe user was not found in our database. The username or password is incorrect.")
             continue
 
         if current_user != "":
@@ -115,16 +114,15 @@ def login():
             # Passwords.pwd_format(pwd)
             clearConsole()
             print(f"\nWelcome back, {uUsername}.")
-            Menu.menu()
+            menu()
 
 def logout():
     print("\nLogging you out...")
-    sleep(1.5)
+    sleep(1)
     clearConsole()
     print("You have been logged out. Have a wonderful day!")
-    sleep(3)
+    sleep(2)
     clearConsole()
-    login()
 
 def confirmPass():
     pass
@@ -145,7 +143,6 @@ def createEntry():
         else:
             break
     
-    # eusername = input("2. Input the username of your entry (not your E-mail): ")
     eemail = input("3. Input the E-mail of your entry: ")
     epassword = input("4. Input the password of your entry: ")
     
@@ -224,7 +221,6 @@ def editEntry():
         changeNotes = input("What notes would you like to add?: ")
     else:
         clearConsole()
-        Menu.menu()
     
 def findPwd():
     passwords = loadPwd()
@@ -235,9 +231,9 @@ def findPwd():
 
     current_user = ""    
     for pwd in passwords:
-        if searchUsers == pwd.entry:
+        if searchUsers == pwd.username:
             print("\nFound entry! Loading...\n")
-            sleep(1.5)
+            sleep(1)
             current_user = pwd
             break
     else:
@@ -281,6 +277,7 @@ def pressEnter():
         clearConsole()
 
 def main():
+    clearConsole()
     login()
 
 if __name__ == "__main__":
