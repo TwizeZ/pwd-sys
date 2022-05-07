@@ -6,6 +6,15 @@
 from time import sleep
 from getpwd import getpwd
 import os
+import logging
+
+logging.basicConfig(filename="activity.log", 
+                    format='%(asctime)s %(levelname)s %(message)s', 
+                    filemode='a', encoding="utf-8", datefmt='%d-%m-%y %H:%M:%S')
+#Let us Create an object 
+logger = logging.getLogger()
+# Set the threshold of logger to INFO
+logger.setLevel(logging.INFO)
 
 def options():
     print()
@@ -18,6 +27,7 @@ def options():
     print("You can also use the following inputs to change your user settings:")
     print("Change username - 'usernm'")
     print("Change password - 'passwd'")
+    print("Delete user - 'delusr'")
 
 def menu():
     options()
@@ -38,6 +48,9 @@ def menu():
             pass
         elif choice == "passwd":
             pass
+        elif choice == "delusr":
+            deleteEntry()
+            break
         else:
             clearConsole()
             print("Invalid option. Please choose between the options listed.")
@@ -53,6 +66,7 @@ def menu():
         quit()
 
     logout()
+
 class Passwords:
     def __init__(self, username : str, email : str, password : str, notes : str):
         # function for format in passwords.txt
@@ -92,28 +106,30 @@ def login():
 
     print("Database online.")
     print("All systems online.")
-    print("Proceed by logging in to your account.")
 
     while True:
-        uUsername = input("\nInput your username: ")
-        uPassword = getpwd("Input your password: ")
+        print("Proceed by logging in to your account.\n")
+        login.loginUsername = input("\nInput your username: ")
+        loginPassword = getpwd("Input your password: ")
 
         current_user = ""
         for pwd in passwords:
-            if uPassword == pwd.password and uUsername == pwd.username:
+            if loginPassword == pwd.password and login.loginUsername == pwd.username:
                 print("\nLogging in...")
                 sleep(1)
                 current_user = pwd
                 break
         else:
-            print("\nThe user was not found in our database. The username or password is incorrect.")
+            print("\nThe user was not found in our database. The username or password is incorrect. Remember that the input is CAPS-sensitive.")
+            logging.warning('Detected login attempt by [{}]: Failed'.format(login.loginUsername))
             continue
 
         if current_user != "":
             # då har vi kommit åt rätt inloggning
             # Passwords.pwd_format(pwd)
             clearConsole()
-            print(f"\nWelcome back, {uUsername}.")
+            print(f"\nWelcome back, {login.loginUsername}.")
+            logging.info('Detected login attempt by [{}]: Succeeded'.format(login.loginUsername))
             menu()
 
 def logout():
@@ -121,6 +137,8 @@ def logout():
     sleep(1)
     clearConsole()
     print("You have been logged out. Have a wonderful day!")
+    
+    logging.info('User [{}] have been logged out'.format(login.loginUsername))
     sleep(2)
     clearConsole()
 
@@ -129,57 +147,58 @@ def confirmPass():
 # NOTE is this even necessary?
 
 def createEntry():
-    current_user = ""
     passwords = loadPwd()
 
     print("\nFill in the form. Note that entering an E-mail is optional.\n")
     
     while True:
-        eusername = input("1. Input a username: ")  
+        createUsername = input("1. Input a username: ")  
         for pwd in passwords:
-            if eusername == pwd.username:
+            if createUsername == pwd.username:
                 print("\nA user with the same name already exists. Please pick another username.\n")
                 break
         else:
             break
     
-    eemail = input("3. Input the E-mail of your entry: ")
-    epassword = input("4. Input the password of your entry: ")
+    createEmail = input("3. Input the E-mail of your entry: ")
+    if "@" not in createEmail:
+        createEmail = "-"
     
-    #NOTE Ask to input password a second time to be sure it is spelled correctly
+    while True:
+        createPassword = getpwd("4. Input the password of your entry: ")   
+        checkPassword =getpwd("   Please input the same password again: ")
+        if checkPassword != createPassword:
+            print("Password does not match! Please input the password a second time again.")
+            continue
+        else:
+            break
     
-    # while True:
-    #     epassword2 =input("   Please input the same password again: ")
-    #     if epassword2 != epassword:
-    #         print("Password does not match! Please input the password a second time again.")
-    #         continue
-    #     else:
-    #         break
-    
-    enotes = input("5. Would you like to add any notes to your entry? [yes, no]:")
+    addNotes = input("5. Would you like to add any notes to your entry? [yes, no]:")
 
-    if "yes".casefold() in enotes.casefold():
-        enotes = ""
-        enotes = input("Input your notes: ")
+    if "yes".casefold() in addNotes.casefold():
+        createNotes = input("Input your notes: ")
     else:
-        enotes = ""
-        enotes = "-"
+        createNotes = "-"
     
     with open("passwords.txt", "a", encoding="utf8") as x:
-        x.write("\n"+eusername+"/"+eemail+"/"+epassword+"/"+enotes+"/")
+        x.write("\n"+createUsername+"/"+createEmail+"/"+createPassword+"/"+createNotes+"/")
     
-    print(f"A user by the name of '{eusername}' was successfully created.")
-    viewNow = input("Would you like to view the entry now? [yes, no]:")
+    print(f"A user by the name of '{createUsername}' was successfully created.")
+    logging.info('User [{}] created a new entry in database: {}'.format(login.loginUsername, createUsername))
+    viewNow = input("Would you like to view the entry now? [yes, no]: ")
     
     print()
     if "yes".casefold() in viewNow.casefold():
+        passwords = loadPwd()
         current_user = ""
         for pwd in passwords:
-            if eusername == pwd.username:
+            if createUsername == pwd.username:
                 current_user = pwd
                 break
         else:
             print("Error: Could not load entry. Please report this issue to the developer.")
+            logging.error('User [{}] tried to view new entry: Failed'.format(login.loginUsername))
+            pressEnter()
 
         if current_user != "":
             # då har vi kommit åt rätt inloggning
@@ -189,38 +208,43 @@ def createEntry():
         pressEnter()
 
 def deleteEntry():
-    deleteEntry = input("Type the name of the entry to confirm that you want to delete the entry: ")
-    # TODO Add if-sats to check that deleteEntry is the same as the one currently displayed.
-
-    with open("passwords.txt", "r", encoding="utf8") as f:
-        lines = f.readlines()
-    with open("passwords.txt", "w", encoding="utf8") as f:
-        for line in lines:
-            if line.strip("\n") != deleteEntry:
-                f.write(line)
-
-# TODO Convert entire function to simple commands accessible from main menu. Remove ability to modify certain properties if necessary.
-def editEntry():
-    choice = input("What you you like to edit in your entry?\n>> ")
+    print("\nNOTE: This will delete the user that you're currently logged in as.\n")
+    deleteUserUsername = login.loginUsername
+    deleteUserPassword = input("Type your password to confirm your user delete request: ")
     
-    print("[1] Username.")
-    print("[2] E-mail.")
-    print("[3] Password.")
-    print("[4] Notes.")
-    print()
-    print("[0] Back to main menu.")
-    
-    if choice == "1":
-        changeUsername = input("What would you like to change the username to?: ")
-    elif choice == "2":
-        changeEmail = input("What would you like to change the E-mail to?: ")
-    elif choice == "3":
-        # TODO Please input your current password
-        changePassword = input("What would you like to change the password to?: ")
-    elif choice == "4":
-        changeNotes = input("What notes would you like to add?: ")
+    passwords = loadPwd()
+    current_user = ""   
+    for pwd in passwords:
+        if deleteUserUsername == pwd.username and deleteUserPassword == pwd.password:
+            with open("passwords.txt", "r", encoding="utf-8") as myFile:
+                for num, line in enumerate(myFile, 1):
+                    if deleteUserUsername in line:
+                        deleteLineUser = [num-1]
+            current_user = pwd
+            break
     else:
-        clearConsole()
+        print("\nPassword does not match. Deletion request could not be fullfilled. Please restart the process from the main menu.")
+        logging.warning('User delete request by {}: Denied - Wrong password'.format(login.loginUsername))
+        pressEnter()
+
+    if current_user != "":
+        # då har vi kommit åt rätt inloggning
+        
+        lines = []
+        
+        with open("passwords.txt", "r", encoding="utf8") as f:
+            lines = f.readlines()
+
+        with open("passwords.txt", 'w', encoding="utf-8") as f:
+            # iterate each line
+            for number, line in enumerate(lines):
+                if number not in deleteLineUser:
+                    f.write(line)
+
+        print(f"User '{deleteUserUsername}' was successfully deleted.")
+        logging.info('User delete request by {}: Confirmed'.format(login.loginUsername))
+        print("Redirecting you...")
+        sleep(5)
     
 def findPwd():
     passwords = loadPwd()
@@ -244,9 +268,30 @@ def findPwd():
         Passwords.pwd_format(pwd)    
     
     pressEnter()
+        
+def logRecord():
+    test = 1
+
+    # loginAttemptConfirmed = "" DONE
+    # loginAttemptDenied = "" DONE
+    # passwordChangeConfirmed = ""
+    # passwordChangeDenied = ""
+    # usernameChangeConformed = ""
+    # usernameChangeDenied = ""
+    # logoutRequest = "" # TODO person som loggats ut samt när (tid) den gjort det
+    # userCreated = ""
+    # userDeleted = ""
+
+    #some messages to test
+    logger.debug("This is just a harmless debug message") 
+    logger.info(f"This is just an information for {test}") 
+    logger.warning(f"Detected login attempt by {test}: Login attempt failed.") 
+    logger.error("Have you try to divide a number by zero") 
+    logger.critical("The Internet is not working....")
 
 def loadPwd():
-    passwords = []
+    logging.info('Database opened')
+    password = []
     with open("passwords.txt", "r", encoding="utf8") as f:
         for line in f.readlines():
             section = line.split("/")
@@ -255,8 +300,8 @@ def loadPwd():
                             section[2],
                             section[3])
             
-            passwords.append(pwd)
-    return passwords
+            password.append(pwd)
+    return password
 
 def totPwd():
     with open("passwords.txt", "r", encoding="utf8") as f:
@@ -271,8 +316,7 @@ def clearConsole():
 
 def pressEnter():
     print()
-    print("\nPress Enter to go back to the main menu")
-    i = input(">> ")
+    i = input("\nPress Enter to continue\n>> ")
     if "" in i:
         clearConsole()
 
