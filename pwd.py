@@ -47,7 +47,7 @@ def menu():
         elif choice == "usernm":
             pass
         elif choice == "passwd":
-            pass
+            change_password()
         elif choice == "delusr":
             deleteEntry()
             break
@@ -110,11 +110,11 @@ def login():
     while True:
         print("Proceed by logging in to your account.\n")
         login.loginUsername = input("\nInput your username: ")
-        loginPassword = getpwd("Input your password: ")
+        login.loginPassword = getpwd("Input your password: ")
 
         current_user = ""
         for pwd in passwords:
-            if loginPassword == pwd.password and login.loginUsername == pwd.username:
+            if login.loginPassword == pwd.password and login.loginUsername == pwd.username:
                 print("\nLogging in...")
                 sleep(1)
                 current_user = pwd
@@ -141,10 +141,6 @@ def logout():
     logging.info('User [{}] have been logged out'.format(login.loginUsername))
     sleep(2)
     clearConsole()
-
-def confirmPass():
-    pass
-# NOTE is this even necessary?
 
 def createEntry():
     passwords = loadPwd()
@@ -246,6 +242,33 @@ def deleteEntry():
         print("Redirecting you...")
         sleep(5)
     
+def change_password():
+    
+    current_username = login.loginUsername
+    current_password = input("Input your current password: ")
+
+    passwords = loadPwd()
+    current_user = ""   
+    for pwd in passwords:
+        if current_username == pwd.username and current_password == pwd.password:
+            with open("passwords.txt", "r", encoding="utf-8") as myFile:
+                for num, line in enumerate(myFile, 1):
+                    if current_password in line:
+                        entryline_to_change = [num-1]
+            current_user = pwd
+            break
+    else:
+        print("\nPassword does not match. Password could not be changed. Please restart the process from the main menu.")
+        logging.warning('User delete request by {}: Denied - Wrong password'.format(login.loginUsername))
+        pressEnter()
+
+    if current_user != "":
+        # då har vi kommit åt rätt inloggning
+        print(entryline_to_change)
+        # NOTE För tillfället printar den endast den line som entryn finns på
+
+
+
 def findPwd():
     passwords = loadPwd()
 
