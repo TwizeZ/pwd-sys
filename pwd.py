@@ -70,6 +70,15 @@ def menu():
 class Passwords:
     def __init__(self, username : str, email : str, password : str, notes : str):
         # function for format in passwords.txt
+        """Password properties
+
+        Args:
+            username (str): An entry's username. Used to log into the system.
+            email (str): The entry's e-mail.
+            password (str): The entry's password. Used to log into the system.
+            notes (str): Additional notes tied to an entry.
+        """
+
         self.username = username
         self.email = email
         self.password = password
