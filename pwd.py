@@ -82,7 +82,6 @@ def menu():
 
         options()
         choice = input(">> ")
-        # BUG Saves choice from first input, and just repeats it every time you press enter. If you press another input, it does not update it.
 
     else:
         clearConsole()
@@ -141,8 +140,8 @@ def pwdList():
     pressEnter()
 
 def login():
+    print("Initiating password system...")
     while True:
-        print("Initiating password system...")
         database = loadPwd()
         print("All systems online.")
 
@@ -158,7 +157,7 @@ def login():
                 current_user = pwd
                 break
         else:
-            print("\nThe user was not found in our database. The username or password is incorrect. Remember that the input is CAPS-sensitive.")
+            print("\nThe user was not found in our database. The username or password is incorrect. Remember that the input is CAPS-sensitive.\n")
             # Logs the unsuccessful login attempt as 'WARNING'.
             logging.warning(f"Detected login attempt by user '{login.loginUsername}': Failed")
             continue
@@ -187,38 +186,70 @@ def createEntry():
     print("\nFill in the form. Note that entering an E-mail is optional. You cannot use '/' in any of your inputs.\n")
     
     while True:
+        invalid_name = 0
         createUsername = input("1. Input a username: ")  
         for pwd in database:
             if createUsername == pwd.username:
                 print("\nA user with the same name already exists. Please pick another username.\n")
+                invalid_name = 1
                 break
-        else:
-            break
-    
-    createEmail = input("3. Input the E-mail of your entry: ")
-    if "@" not in createEmail:
-        createEmail = "-"
-    
-    while True:
-        createPassword = getpwd("4. Input the password of your entry: ")   
-        checkPassword =getpwd("   Please input the same password again: ")
-        if checkPassword != createPassword:
-            print("Password does not match! Please input the password a second time again.")
+        if invalid_name == 1:
+            continue
+        elif "/" in createUsername:
+            print("\nYour username cannot include the symbol '/'.\n")
+            continue
+        elif createUsername == "":
+            print("\nYou need a username. Do not leave this empty.\n")
             continue
         else:
             break
     
-    addNotes = input("5. Would you like to add any notes to your entry? [yes, no]:")
+    while True:
+        createEmail = input("\n2. Input the E-mail of your entry (optional): ")
+        if "/" in createEmail:
+            print("\nYour e-mail cannot include the symbol '/'.\n")
+            continue
+        elif "@" not in createEmail or createEmail == "":
+            createEmail = "-"
+            break
+        else:
+            break
+    
+    while True:
+        createPassword = getpwd("\n3. Input the password of your entry: ")   
+        checkPassword =getpwd("Please input the same password again: ")
+        if checkPassword != createPassword:
+            print("\nPassword does not match! Please input the password a second time again.\n")
+            continue
+        elif "/" in createPassword:
+            print("\nYour password cannot include the symbol '/'.\n")
+            continue
+        elif createPassword == "":
+            print("\nYou need a password. Do not leave this empty.\n")
+            continue
+        else:
+            break
+    
+    addNotes = input("\n4. Would you like to add any notes to your entry? [yes, no]: ")
 
     if "yes".casefold() in addNotes.casefold():
-        createNotes = input("Input your notes: ")
+        while True:
+            createNotes = input("\nInput your notes: ")
+            if "/" in createNotes:
+                print("\nYour notes cannot include the symbol '/'.\n")
+                continue
+            elif createNotes == "":
+                createNotes = "-"
+                break
+            else:
+                break
     else:
         createNotes = "-"
     
     with open("passwords.txt", "a", encoding="utf8") as x:
         x.write(createUsername+"/"+createEmail+"/"+createPassword+"/"+createNotes+"/"+"\n")
     
-    print(f"A user by the name of '{createUsername}' was successfully created.")
+    print(f"\nA user by the name of '{createUsername}' was successfully created.\n")
     # Logs the successful entry creation as 'INFO'.
     logging.info(f"User '{login.loginUsername}' created a new entry in database: '{createUsername}'")
     viewNow = input("Would you like to view the entry now? [yes, no]: ")
@@ -261,16 +292,20 @@ def deleteEntry():
         return False
 
     if current_user != "":
-        # då har vi kommit åt rätt inloggning
+        # The original entry currently logged in was found in the database.
+
+        # Empty list to temporarily store the database in.
         lines = []
+        # Receives and places the database in the temporarily list.
         with open("passwords.txt", "r", encoding="utf8") as f:
             lines = f.readlines()
+        # Deletes all entries in database, and puts back all entries that were not supposed to be deleted.
         with open("passwords.txt", 'w', encoding="utf-8") as f:
             for number, line in enumerate(lines):
                 if number not in deleteLineUser:
                     f.write(line)
 
-        print(f"User '{username}' was successfully deleted.")
+        print(f"\nUser '{username}' was successfully deleted.\n")
         # Logs the successful user deletion as 'INFO'.
         logging.info(f"User delete request by {username}: Confirmed")
         print("Redirecting you...")
@@ -298,7 +333,7 @@ def change_password():
             current_user = pwd
             break
     else:
-        print("\nPassword does not match. Password could not be changed. Please restart the process from the main menu.")
+        print("\nPassword does not match. Password could not be changed. Please restart the process from the main menu.\n")
         # Logs the unsuccessful password change as 'WARNING'.
         logging.warning(f"Password change request by {username}: Denied - Wrong password")
         pressEnter()
@@ -337,10 +372,13 @@ def change_password():
             new_password = getpwd("\nInput your new password: ")
             check_password =getpwd("\nInput your new password again: ")
             if check_password != new_password:
-                print("Password does not match! Please input the password a second time again.")
+                print("\nPassword does not match! Please input the password a second time again.\n")
                 continue
             elif "/" in new_password:
-                print("Your password cannot include the symbol '/'.")
+                print("\nYour password cannot include the symbol '/'.\n")
+                continue
+            elif new_password == "":
+                print("\nYou need a password. Do not leave this empty.\n")
                 continue
             else:
                 break
@@ -361,7 +399,7 @@ def change_password():
             f.write(original_username+"/"+original_email+"/"+new_password+"/"+original_notes+"/"+"\n")
                     
 
-        print(f"Password for user '{username}' was successfully changed.")
+        print(f"\nPassword for user '{username}' was successfully changed.")
         # Logs the successful password change as 'INFO'.
         logging.info(f"Password change request by {username}: Confirmed - New password: {new_password}")
         pressEnter()
@@ -388,7 +426,7 @@ def change_username():
             current_user = pwd
             break
     else:
-        print("\nPassword does not match. Password could not be changed. Please restart the process from the main menu.")
+        print("\nPassword does not match. Password could not be changed. Please restart the process from the main menu.\n")
         # Logs the unsuccessful name change as 'WARNING'.
         logging.warning(f"Username change request by {current_username} denied: Wrong password")
         pressEnter()
@@ -424,21 +462,23 @@ def change_username():
         
         # Your new username input
         while True:
+            invalid_name = 0
             new_username = input("\nInput your new username: ")
             
             # Checks that the username is not already taken. If not, it proceeds.
             for pwd in database:
                 if new_username == pwd.username:
-                    print("That username is already in use. Please choose a different username.")
+                    print("\nThat username is already in use. Please choose a different username.\n")
                     invalid_name = 1
-                    break
-                else:
                     break
             if invalid_name == 1:
                 continue
             elif "/" in new_username:
-                print("Your username cannot include the symbol '/'.")
-                break
+                print("\nYour username cannot include the symbol '/'.\n")
+                continue
+            elif new_username == "":
+                print("\nYou need a username. Do not leave this empty.\n")
+                continue
             else:
                 break
         
@@ -458,7 +498,7 @@ def change_username():
             f.write(new_username+"/"+original_email+"/"+original_password+"/"+original_notes+"/"+"\n")
                     
 
-        print(f"Username for '{current_username}' was successfully changed to {new_username}.")
+        print(f"\nUsername for '{current_username}' was successfully changed to {new_username}.")
         # Logs the successful name change as 'INFO'.
         logging.info(f"User '{current_username}' successfully changed their username to {new_username}")
         pressEnter()
@@ -478,7 +518,7 @@ def findPwd():
             current_user = pwd
             break
     else:
-        print("Not found in database. The entry does not exist. Make sure you use CAPS properly.")
+        print("\nNot found in database. The entry does not exist. Make sure you use CAPS properly.\n")
 
     if current_user != "":
         # då har vi kommit åt rätt inloggning
