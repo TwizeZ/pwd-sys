@@ -19,6 +19,19 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 def options():
+    """Menu
+
+    Choices:
+        0: Exits the system completely.
+        1: Creates new entry.
+        2: Shows list of all entries in database (only their username).
+        3: Can help you search for an entry and display its properties (username, e-mail, password (censored), notes).
+        4: Logs you out from system.
+        usernm: Change your username. Logs you out afterwards.
+        passwd: Change your password. Logs you out afterwards.
+        delusr: Delete the user currently logged in. Logs you out afterwards. 
+    """
+    
     # Options displayed when 'menu' function is called upon.
     print()
     print("[1] Create new entry.")
@@ -33,25 +46,30 @@ def options():
     print("Delete user - 'delusr'")
 
 def menu():
-    """Menu
+    if login.username == "admin" and login.password == "admin":
+        print("DISCLAIMER: Read the 'README.md' file that comes with the program before using it.")
+        print()
+        print("Welcome to pwd-sys!")
+        print("It is strongly adviced that you start off by changing the password of the 'admin' user.")
+        print("You should also create new entries for different users of this system.")
+        print()
+        print("If you have any additional questions, you can contact the developer.")
+        proceed()
+    else:
+        pass
 
-    Choices:
-        0: Exits the system completely.
-        1: Creates new entry.
-        2: Shows list of all entries in database (only their username).
-        3: Can help you search for an entry and display its properties (username, e-mail, password (censored), notes).
-        4: Logs you out from system.
-        usernm: Change your username. Logs you out afterwards.
-        passwd: Change your password. Logs you out afterwards.
-        delusr: Delete the user currently logged in. Logs you out afterwards. 
-    """
+# TODO move welcome screen away from the if-statement above
 
     options()
     choice = input(">> ")
 
     while choice != "0":
         if choice == "1":
-            create_entry()
+            action = create_entry()
+            if action == False:
+                pass
+            else:
+                break
         elif choice == "2":
             pwd_list()
         elif choice == "3":
@@ -60,19 +78,15 @@ def menu():
             break
         elif choice == "usernm":
             change_username()
-            if change_username == False:
-                pass
-            else:
-                break
         elif choice == "passwd":
-            change_password()
-            if change_password == False:
+            action = change_password()
+            if action == False:
                 pass
             else:
                 break
         elif choice == "delusr":
-            delete_entry()
-            if delete_entry == False:
+            action = delete_entry()
+            if action == False:
                 pass
             else:
                 break
@@ -87,8 +101,8 @@ def menu():
         clear_console()
         print("You chose to end the program. See you next time.")
         # Logs the successful application exit attempt by user as 'INFO'.
-        logging.info(f"User '{login.username}' successfully exited the system.")
         sleep(2)
+        logging.info(f"User '{login.username}' successfully exited the system.")
         quit()
 
     logout()
@@ -118,13 +132,15 @@ class Password:
         print(f"E-mail:     {self.email}")
         print(f"Password:   {pwd_hidden}")
         print("---")
-        print("Security note:")
+        print("Notes:")
         print(self.notes)
         print("-------------------------------")
         # Logs the user viewing another user's entry as 'INFO'.
         logging.info(f"User '{login.username}' is viewing the entry of user '{self.username}'")
 
 def pwd_list():
+    clear_console()
+    
     # Logs the user viewing the full entrylist as 'INFO'.
     logging.info(f"User '{login.username}' is viewing an entire list of all users in the database")
     count = 0
@@ -181,8 +197,10 @@ def logout():
     clear_console()
 
 def create_entry():
+    clear_console()
+    
     database = load_db()
-
+    
     print("\nFill in the form. Note that entering an E-mail is optional. You cannot use '/' in any of your inputs.\n")
     
     while True:
@@ -215,17 +233,54 @@ def create_entry():
         else:
             break
     
+    # Enter a password
+    print("""
+Minimum password requirements are as follows:
+- must be at least 8 characters in total
+- must include an uppercase letter
+- must include 2 numbers
+- cannot include the symbol '/'
+        """)
+
     while True:
-        create_password = getpwd("\n3. Input the password of your entry: ")   
-        check_password =getpwd("Please input the same password again: ")
-        if check_password != create_password:
-            print("\nPassword does not match! Please input the password a second time again.\n")
+        
+
+        create_password = getpwd("3. Input the password of your entry: ")   
+        
+        # Checks if 'create_password' includes an uppercase letter
+        res = any(ele.isupper() for ele in create_password)
+        
+        # Checks if 'create_password' includes two numbers
+        digit = 0
+        for num in create_password:
+            if num.isdigit():
+                digit=digit+1
+            else:
+                pass
+
+        # If-statement checks that all criteria's are met before asking you to confirm your password.
+        if create_password == "":
+            print("\nYou need a password. Do not leave this empty.\n")
             continue
         elif "/" in create_password:
             print("\nYour password cannot include the symbol '/'.\n")
             continue
-        elif create_password == "":
-            print("\nYou need a password. Do not leave this empty.\n")
+        elif len(create_password) < 8:
+            print("\nNot enough characters. Remember to ask make use of 2 numbers and an uppercase letter.\n")
+            continue
+        elif res == False:
+            print("\nYou're missing an uppercase letter.\n")
+            continue
+        elif digit < 2:
+            print(f"\nTwo numbers are required. Current amount of numbers: {digit}.\n")
+            continue
+        else:
+            pass
+        
+        # Asks user to input password a second time.
+        check_password = getpwd("\n   Input the password again: ")
+        if check_password != create_password:
+            print("\nPassword does not match! Please input the password a second time again.\n")
             continue
         else:
             break
@@ -244,32 +299,37 @@ def create_entry():
             else:
                 break
     else:
-        createNotes = "-"
+        create_notes = "-"
     
     with open("passwords.txt", "a", encoding="utf8") as x:
         x.write(create_username+"/"+create_email+"/"+create_password+"/"+create_notes+"/"+"\n")
     
+    clear_console()
+
     print(f"\nA user by the name of '{create_username}' was successfully created.\n")
     # Logs the successful entry creation as 'INFO'.
     logging.info(f"User '{login.username}' created a new entry in database: '{create_username}'")
-    view_entry = input("Would you like to view the entry now? [yes, no]: ")
-    
+    print("Summary of new entry loading...")
+    sleep(2)
     print()
-    if "yes".casefold() in view_entry.casefold():
-        database = load_db()
-        current_user = ""
-        for pwd in database:
-            if create_username == pwd.username:
-                current_user = pwd
-                break
+    
+    database = load_db()
+    current_user = ""
+    for pwd in database:
+        if create_username == pwd.username:
+            current_user = pwd
+            break
 
-        if current_user != "":
-            Password.pwd_format(pwd)
-            proceed()
-    else:
-        proceed()
+    if current_user != "":
+        Password.pwd_format(pwd)
+
+    logout_now = input("\nWould you like to log in to your new entry? [yes, no]: ")
+    clear_console()
+    return True if "yes".casefold() in logout_now.casefold() else False
 
 def delete_entry():
+    clear_console()
+    
     print("\nNOTE: This will delete the user that you're currently logged in as.\n")
     username = login.username
     password = getpwd("Type your password to confirm your user delete request: ")
@@ -287,7 +347,7 @@ def delete_entry():
     else:
         print("\nPassword does not match. Deletion request could not be fullfilled. Please restart the process from the main menu.")
         # Logs the unsuccessful user deletion as 'WARNING'.
-        logging.warning(f"User delete request by {username}: Denied - Wrong password")
+        logging.warning(f"User delete request by {username} denied: Wrong password")
         proceed()
         return False
 
@@ -305,15 +365,17 @@ def delete_entry():
                 if number not in delete_line:
                     f.write(line)
 
-        print(f"\nUser '{username}' was successfully deleted.\n")
+        clear_console()
+
+        print(f"User '{username}' was successfully deleted.")
         # Logs the successful user deletion as 'INFO'.
-        logging.info(f"User delete request by {username}: Confirmed")
-        print("Redirecting you...")
-        sleep(3)
+        logging.info(f"User delete request by {username} confirmed")
+        proceed()
         return True
     
 def change_password():
-    
+    clear_console()
+
     username = login.username
 
     current_password = getpwd("\nInput your current password: ")
@@ -335,7 +397,7 @@ def change_password():
     else:
         print("\nPassword does not match. Password could not be changed. Please restart the process from the main menu.\n")
         # Logs the unsuccessful password change as 'WARNING'.
-        logging.warning(f"Password change request by {username}: Denied - Wrong password")
+        logging.warning(f"Password change request by {username} denied: Wrong password")
         proceed()
         return False
     
@@ -368,17 +430,51 @@ def change_password():
         original_notes = itemgetter(3)(split_list)
         
         # Your new password input
+        print("""
+Minimum password requirements are as follows:
+- must be at least 8 characters in total
+- must include an uppercase letter
+- must include 2 numbers
+- cannot include the symbol '/'
+        """)
+
         while True:
             new_password = getpwd("\nInput your new password: ")
-            check_password =getpwd("\nInput your new password again: ")
-            if check_password != new_password:
-                print("\nPassword does not match! Please input the password a second time again.\n")
+
+            # Checks if 'create_password' includes an uppercase letter
+            res = any(ele.isupper() for ele in new_password)
+            
+            # Checks if 'create_password' includes two numbers
+            digit = 0
+            for num in new_password:
+                if num.isdigit():
+                    digit=digit+1
+                else:
+                    pass
+
+            # If-statement checks that all criteria's are met before asking you to confirm your password.
+            if new_password == "":
+                print("\nYou need a password. Do not leave this empty.\n")
                 continue
             elif "/" in new_password:
                 print("\nYour password cannot include the symbol '/'.\n")
                 continue
-            elif new_password == "":
-                print("\nYou need a password. Do not leave this empty.\n")
+            elif len(new_password) < 8:
+                print("\nNot enough characters. Remember to ask make use of 2 numbers and an uppercase letter.\n")
+                continue
+            elif res == False:
+                print("\nYou're missing an uppercase letter.\n")
+                continue
+            elif digit < 2:
+                print(f"\nTwo numbers are required. Current amount of numbers: {digit}.\n")
+                continue
+            else:
+                pass
+
+            # Asks user to input password a second time.
+            check_password = getpwd("\n   Input the password again: ")
+            if check_password != new_password:
+                print("\nPassword does not match! Please input the password a second time again.\n")
                 continue
             else:
                 break
@@ -401,12 +497,13 @@ def change_password():
 
         print(f"\nPassword for user '{username}' was successfully changed.")
         # Logs the successful password change as 'INFO'.
-        logging.info(f"Password change request by {username}: Confirmed - New password: {new_password}")
+        logging.info(f"Password change request by {username} confirmed")
         proceed()
         return True
 
 def change_username():
-    
+    clear_console()
+
     current_username = login.username
 
     password = getpwd("\nInput your password: ")
@@ -430,7 +527,6 @@ def change_username():
         # Logs the unsuccessful name change as 'WARNING'.
         logging.warning(f"Username change request by {current_username} denied: Wrong password")
         proceed()
-        return False
     
 
     if current_user != "":
@@ -502,9 +598,13 @@ def change_username():
         # Logs the successful name change as 'INFO'.
         logging.info(f"User '{current_username}' successfully changed their username to {new_username}")
         proceed()
-        return True
+
+def check_pwd():
+    pass
 
 def find_entry():
+    clear_console()
+    
     database = load_db()
 
     while True: # TODO Fix this while-loop.
