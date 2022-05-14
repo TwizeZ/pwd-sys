@@ -83,7 +83,7 @@ Currently logged in as {login.username}
 [1] Create new entry.
 [2] List of all entries.
 [3] Search entries
-[5] Log out
+[4] Log out
 [0] Exit application.
 
 User settings:
