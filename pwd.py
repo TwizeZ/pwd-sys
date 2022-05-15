@@ -82,8 +82,8 @@ Currently logged in as {login.username}.
 
 [1] Create new entry.
 [2] List of all entries.
-[3] Search entries
-[4] Log out
+[3] Search entries.
+[4] Log out.
 [0] Exit application.
 
 User settings:
@@ -400,7 +400,17 @@ def delete_entry():
     # Asks for user's password to confirm identity.
     print("\nNOTE: This will delete the user that you're currently logged in as.\n")
     username = login.username
-    password = getpwd("Type your password to confirm your user delete request: ")
+    
+    if username == "admin":
+        print(
+            "\nYou cannot delete the standard admin account. However, you can change the password of the entry."
+            )
+        proceed()
+        clear_console()
+        # Return tells menu to keep user logged in.
+        return False
+    else:
+        password = getpwd("Type your password to confirm your user delete request: ")
 
     # Checks that username and password is valid.
     database = load_db()
@@ -605,11 +615,18 @@ def change_username():
 
     # Asks for user's password to confirm identity.
     current_username = login.username
-    password = getpwd("\nInput your password: ")
-    print()
+    
+    if current_username == "admin":
+        print(
+            "\nYou cannot change the standard admin username. However, you can change the password of the entry."
+            )
+        proceed()
+        clear_console()
+        return
+    else:
+        password = getpwd("\nInput your password: ")
 
     database = load_db()
-
     # Identifies the entry in the database.
     current_user = ""
     for pwd in database:
