@@ -78,7 +78,7 @@ def menu_options():
 
     print(
         f"""
-Currently logged in as {login.username}
+Currently logged in as {login.username}.
 
 [1] Create new entry.
 [2] List of all entries.
