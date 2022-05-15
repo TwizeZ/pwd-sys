@@ -12,9 +12,6 @@ The program consists of the following files:
 
 *Contains all code needed for the program to work as intended.*
 
-
-
-
 ### 2. passwords.txt
 
 *This is the database where all entries/users are stored. This file can be manually edited, but it is strongly recommended that you do not touch this.*
