@@ -88,8 +88,6 @@ After that, you will have to complete the following steps in your CLI/terminal:
     pip install getpwd
 ```
 
-The following installations must be made for the program to run.
-
 ## Code conventions
 
 All code written is following the PEP-8 standard to keep it structured and organized.
