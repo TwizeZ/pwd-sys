@@ -159,12 +159,9 @@ A more detailed roadmap can be found in the Github project, by following [this l
     - [ ] Swedish
     - [ ] German
     - [ ] Spanish
+- [ ] Add a more visually appealing interface
 
 ## Changelog
-
-***Det kan vara rimligt att inkludera vad som har förändrats genom de olika iterationerna som ditt projekt gått igenom. Detta kan antingen göras i din README eller så kan du inkludera en CHANGELOG.md.***
-
-I changelogen ska varje rubrik vara en version. Under varje version bör du inkludera vad du lagt till eller ändrat på (added or changed) under en rubrik samt vad du tagit bort (removed) under en annan. Exempel:
 
 ### Version 1.0.0
 
