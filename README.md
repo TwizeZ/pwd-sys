@@ -273,8 +273,6 @@ A more detailed roadmap can be found in the Github project, by following [this l
 
 ## Contribution
 
-***Inom programmeringsvärlden är det ofta populärt att man vill utveckla andras projekt och bidra till förbättring. För att underlätta detta är det bra om det i READMEn förklaras om det är tillåtet, och om det är det hur en går till väga för att kunna göra det. Detta avsnitt skulle se ut som följande:*** 
-
 It is allowed to continue the development of this program on your own hand, as long as you are following the requirements of the license used, as stated below.
 
 ## License
