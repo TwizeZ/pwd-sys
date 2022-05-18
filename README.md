@@ -100,7 +100,7 @@ This project is created as a password system in a CLI-interface.
 
 A menu with different features is also included in the program. In this menu, you are able to manage the system and its users/entries.
 
-![main menu](resources/menu.png)
+![menu](https://user-images.githubusercontent.com/39420036/169040546-de958c8c-f1e2-42fe-969f-737817def579.PNG)
 
 As you can see, the menu offers many features and settings for your user.
 
