@@ -141,21 +141,21 @@ This is a recorded example of how the program works.
 
 A more detailed roadmap can be found in the Github project, by following [this link](https://github.com/TwizeZ/pwd-sys/projects/1).
 
-- [x] Create fuctions for all features
-    - [x] Create entry
-    - [x] Delete entry
-    - [x] Change entry password
-    - [x] Change entry username
-- [x] Create a main menu
-- [x] Function to load database
-- [x] Create a logging system
-- [x] Password display format
-- [x] Begin writing the README-documentation
-- [x] Add comments and Docstrings to code
+- [x] ~~Create fuctions for all features~~
+    - [x] ~~Create entry~~
+    - [x] ~~Delete entry~~
+    - [x] ~~Change entry password~~
+    - [x] ~~Change entry username~~
+- [x] ~~Create a main menu~~
+- [x] ~~Function to load database~~
+- [x] ~~Create a logging system~~
+- [x] ~~Password display format~~
+- [x] ~~Begin writing the README-documentation~~
+- [x] ~~Add comments and Docstrings to code~~
 - [ ] Complete the README-documentation
 - [ ] Lock the 'passwords.txt' file from being accessed outside of the system without administrator access.
 - [ ] Supported languages
-    - [x] English
+    - [x] ~~English~~
     - [ ] Swedish
     - [ ] German
     - [ ] Spanish
