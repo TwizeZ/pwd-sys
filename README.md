@@ -58,8 +58,6 @@ The program's frontend and backend design is written in Python, while Markdown, 
 
 - Python
 - Markdown
-- HTML
-- CSS
 
 ## Requirements/Prequesitions
 
