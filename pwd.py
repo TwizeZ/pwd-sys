@@ -727,6 +727,8 @@ def change_username():
                 + "\n"
             )
 
+        login.username = new_username
+
         print(
             f"\nUsername for '{current_username}' was successfully changed to {new_username}."
         )
