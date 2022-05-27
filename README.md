@@ -150,7 +150,7 @@ A more detailed roadmap can be found in the Github project, by following [this l
 - [x] ~~Password display format~~
 - [x] ~~Begin writing the README-documentation~~
 - [x] ~~Add comments and Docstrings to code~~
-- [ ] Complete the README-documentation
+- [x] ~~Complete the README-documentation~~
 - [ ] Lock the 'passwords.txt' file from being accessed outside of the system without administrator access.
 - [ ] Supported languages
     - [x] ~~English~~
