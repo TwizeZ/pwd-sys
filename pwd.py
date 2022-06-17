@@ -74,6 +74,7 @@ def menu_options():
         usernm: Change your username. Logs you out afterwards.
         passwd: Change your password. Logs you out afterwards.
         delusr: Delete the user currently logged in. Logs you out afterwards.
+        order66: Erases the entire database and deletes all users. Resets admin password to standard password.
     """
 
     print(
@@ -90,6 +91,8 @@ User settings:
 Change username - 'usernm'
 Change password - 'passwd'
 Delete user     - 'delusr'
+
+Emergency reset - 'order66'
     """
     )
 
@@ -143,6 +146,12 @@ If you have any additional questions, you can contact the developer 'TwizeZ' thr
                 break
         elif choice == "delusr":
             action = delete_entry()
+            if action == False:
+                pass
+            else:
+                break
+        elif choice == "order66":
+            action = emergency_reset()
             if action == False:
                 pass
             else:
@@ -836,6 +845,58 @@ def proceed():
     i = input("\nPress Enter to continue.\n>> ")
     if "" in i:
         clear_console()
+
+
+def emergency_reset():
+    clear_console()
+
+    print("An emergency reset will erase ALL entries from the database, making users unable to access the system without the standard admin account.")
+    check = input("Do you want to proceed? (yes, no): ")
+    if "yes" in check:
+        pass
+    else:
+        print("\nProcess was cancelled. You are being returned to the main menu.")
+        proceed()
+        return False
+
+    username = "admin"
+    # Asks for administrator password to confirm identity.
+    current_password = getpwd("\nInput the admin password: ")
+
+    database = load_db()
+
+    # Identifies the admin entry in the database.
+    current_user = ""
+    for pwd in database:
+        if username == pwd.username and current_password == pwd.password:
+            current_user = pwd
+            break
+    else:
+        print(
+            "\nPassword does not match. An emergency reset request could not be fulfilled.\n"
+        )
+        # Logs the unsuccessful emergency reset request as 'CRITICAL'.
+        logging.critical(f"Emergency reset request by {login.username} denied: Wrong administrator password")
+        proceed()
+        # Return tells menu to keep user logged in.
+        return False
+
+    # The admin password was found in the database.
+    if current_user != "":
+
+        # Deletes all entries in database.
+        with open("passwords.txt", "w", encoding="utf-8") as f:
+            # Creates one standard admin entry.
+            f.write(f"admin/-/admin/admin account/\n")
+
+        # Confirms the emergency reset.
+        print(f"\nUser '{login.username}' has initiated a emergency reset. The entire database has been erased.")
+        print(f"A new admin-entry has been created with the original username and password.")
+        # Logs the successful password change as 'INFO'.
+        logging.critical(f"Emergency reset request by {login.username} confirmed. The entire database has been erased of all users.")
+        proceed()
+        # Return tells menu to log you out.
+        return True
 
 
 def main():
